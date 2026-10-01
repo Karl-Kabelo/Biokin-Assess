@@ -1,0 +1,156 @@
+BIOKIN ASSESS - WORKFLOW STRUCTURE AND SAFETY BOUNDARIES
+
+1. Patient Layer
+
+Purpose:
+The patient gives information. No clinical interpretation happens here.
+
+Patient provides:
+- assessment category
+- body map selection
+- symptom type
+- pain score
+- yes/no screening answers
+- free-text symptom story
+- booking preference
+
+Assessment categories:
+- Pain/Injury
+- Rehabilitation
+- Chronic Health
+- Sports Performance
+- General Fitness
+
+2. AI Intake Structuring Layer
+
+Purpose:
+The AI only organises the data. It does not diagnose, treat, or make clinical decisions.
+
+AI outputs:
+- clean patient-reported summary
+- anatomical region selected by the patient
+- surrounding anatomical structures from standard reference anatomy
+- common clinical examination categories for that region
+- positive screening responses
+- unanswered screening responses
+
+AI must NOT output:
+- diagnosis
+- likely condition
+- clinical impression
+- treatment plan
+- referral decision
+- exercise prescription
+- emergency judgement
+
+Safe wording:
+Use:
+- selected anatomical region
+- nearby anatomical structures
+- common examination categories
+- positive screening responses
+- for clinician review only
+
+Avoid:
+- likely affected area
+- possible diagnosis
+- suspected condition
+- suggested treatment
+- red flag confirmed
+- likely L5-S1 involvement
+
+3. Patient View
+
+Purpose:
+Simple, plain-language summary for the patient.
+
+Patient sees:
+- what they reported
+- selected areas
+- pain score
+- free-text symptom description
+- general safety advice
+- clear disclaimer
+- booking calendar
+
+Patient disclaimer:
+This is not a medical diagnosis. Your responses have been organised for review by a qualified professional.
+
+4. Intern Dashboard
+
+Purpose:
+The intern receives a clean case file and completes human clinical reasoning.
+
+Intern sees:
+- raw patient data
+- AI-structured intake
+- anatomical reference layer
+- common exam categories
+- booking details
+
+Intern completes:
+- subjective notes
+- objective assessment plan
+- clinical reasoning
+- proposed intervention strategy
+
+Important:
+Intern notes are human-generated, not AI-generated.
+
+5. Supervisor Dashboard
+
+Purpose:
+The supervisor reviews intern work and provides oversight.
+
+Supervisor sees:
+- case queue
+- patient intake
+- AI-structured reference layer
+- intern notes
+- booking details
+- audit trail
+
+Supervisor actions:
+- Approve
+- Request Changes
+- Escalate / Refer
+- Add guidance comments
+
+Suggested case statuses:
+- New
+- Awaiting Intern Review
+- Draft Plan Ready
+- Supervisor Review Needed
+- Approved
+- Changes Requested
+- Escalated
+
+6. Audit Trail
+
+Purpose:
+Track every important action.
+
+Audit trail records:
+- patient submitted assessment
+- AI intake structuring completed
+- patient booked consultation
+- intern saved notes
+- intern sent case for supervisor review
+- supervisor approved/requested changes/escalated
+- comments added
+
+7. Production Warning
+
+This MVP is not production-ready for real patients yet.
+
+Before real use, add:
+- HTTPS
+- proper consent and privacy policy
+- encrypted storage
+- protected audit logs
+- user role approval
+- admin controls
+- password reset
+- secure deployment
+- clinical/legal review
+- POPIA-aware data handling

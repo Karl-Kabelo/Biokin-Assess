@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIOKIN ASSESS MVP</title>
+  <style>
+    :root {
+      --navy: #07345a;
+      --blue: #0f5f8f;
+      --light: #eaf4fb;
+      --grey: #f4f6f8;
+      --text: #1d1d1f;
+      --muted: #667085;
+      --danger: #b42318;
+      --warning: #b54708;
+      --success: #027a48;
+      --border: #d0d5dd;
+    }
+
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: var(--grey); color: var(--text); }
+    header { background: linear-gradient(135deg, var(--navy), var(--blue)); color: white; padding: 24px; }
+    header h1 { margin: 0; font-size: 32px; }
+    header p { margin: 8px 0 0; max-width: 760px; line-height: 1.5; }
+    .container { max-width: 1180px; margin: 24px auto; padding: 0 16px; }
+    .card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,.04); }
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 800px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    button { border: none; cursor: pointer; border-radius: 999px; padding: 12px 18px; font-weight: 700; background: var(--navy); color: white; margin: 4px; }
+    button:hover { opacity: .9; }
+    .secondary { background: white; color: var(--navy); border: 1px solid var(--navy); }
+    .danger { background: var(--danger); }
+    .success { background: var(--success); }
+    .warning { background: var(--warning); }
+    .pill { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; margin: 5px; background: white; cursor: pointer; }
+    .pill.active { background: var(--navy); color: white; border-color: var(--navy); }
+    .step { display: none; }
+    .step.active { display: block; }
+    .small { color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .disclaimer { background: #fff7ed; border: 1px solid #fed7aa; padding: 16px; border-radius: 12px; color: #7c2d12; line-height: 1.5; }
+    .body-map { display: grid; grid-template-columns: 1fr; justify-items: center; gap: 10px; padding: 20px; background: var(--light); border-radius: 16px; }
+    .body-zone { width: 190px; padding: 10px; border-radius: 12px; border: 1px solid var(--border); background: white; color: var(--navy); font-weight: 700; }
+    .body-zone.selected { background: var(--navy); color: white; }
+    input, textarea, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 6px; margin-bottom: 14px; font-size: 15px; }
+    textarea { min-height: 120px; resize: vertical; }
+    label { font-weight: 700; display: block; margin-top: 10px; }
+    .question-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); padding: 12px 0; }
+    .yes-no button { padding: 8px 14px; background: white; color: var(--navy); border: 1px solid var(--navy); }
+    .yes-no button.active { background: var(--navy); color: white; }
+    .summary-box { background: var(--light); padding: 16px; border-radius: 12px; line-height: 1.6; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+    th { background: var(--grey); }
+    .status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 13px; font-weight: bold; background: #e0f2fe; color: #075985; }
+    .status.approved { background: #dcfce7; color: #166534; }
+    .status.revision { background: #fee2e2; color: #991b1b; }
+    .status.review { background: #fef3c7; color: #92400e; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .time-slot { background: white; color: var(--navy); border: 1px solid var(--navy); }
+    .time-slot.active { background: var(--navy); color: white; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>BIOKIN ASSESS</h1>
+    <p>A pre-consultation intake tool that organises patient-reported symptoms for professional review. It does not diagnose, treat, or replace a qualified clinician.</p>
+  </header>
+
+  <main class="container">
+    <section id="landing" class="step active">
+      <div class="card">
+        <h2>Understand your musculoskeletal symptoms before your consultation</h2>
+        <p>Complete a short assessment so your biokineticist can review your symptoms, body area, pain level, and movement concerns before your session.</p>
+        <div class="grid grid-3">
+          <div class="summary-box"><h3>1. Tell us how you feel</h3><p>Share your symptoms, pain areas, and movement challenges.</p></div>
+          <div class="summary-box"><h3>2. Get a structured summary</h3><p>Your information is organised into a clean report for review.</p></div>
+          <div class="summary-box"><h3>3. Book a consultation</h3><p>Choose a time with a supervised intern or qualified professional.</p></div>
+        </div>
+        <br>
+        <div class="disclaimer"><strong>Important:</strong> This tool does not provide a diagnosis, clinical opinion, treatment plan, or emergency care. All information must be reviewed by a qualified professional.</div>
+        <br>
+        <button onclick="goToStep('category')">Start Free Assessment</button>
+      </div>
+    </section>
+
+    <section id="category" class="step">
+      <div class="card">
+        <h2>Choose your assessment category</h2>
+        <p class="small">Pick the option that best describes why you are here.</p>
+        <div id="categoryOptions">
+          <span class="pill" onclick="selectCategory('Pain/Injury')">Pain/Injury — My joints, muscles, or bones hurt.</span>
+          <span class="pill" onclick="selectCategory('Rehabilitation')">Rehabilitation — I am recovering from surgery or a major injury.</span>
+          <span class="pill" onclick="selectCategory('Chronic Health')">Chronic Health — I need safe exercise guidance.</span>
+          <span class="pill" onclick="selectCategory('Sports Performance')">Sports Performance — I want to perform better.</span>
+          <span class="pill" onclick="selectCategory('General Fitness')">General Fitness — I want to start moving safely.</span>
+        </div>
+        <br>
+        <button class="secondary" onclick="goToStep('landing')">Back</button>
+        <button onclick="goToStep('mapping')">Next</button>
+      </div>
+    </section>
+
+    <section id="mapping" class="step">
+      <div class="card">
+        <h2>Visual symptom mapping</h2>
+        <p class="small">This demo uses buttons as a placeholder for a future 3D body model.</p>
+        <div class="grid grid-2">
+          <div>
+            <label>Figure type</label>
+            <select id="figureType" onchange="appState.patient.figureType=this.value">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Neutral">Neutral</option>
+            </select>
+            <label>Body view</label>
+            <select id="bodyView" onchange="renderBodyMap()">
+              <option value="Anterior">Anterior</option>
+              <option value="Posterior">Posterior</option>
+            </select>
+            <label>Symptom type</label>
+            <select id="symptomType">
+              <option value="Pain">Pain</option>
+              <option value="Stiffness">Stiffness</option>
+              <option value="Weakness">Weakness</option>
+              <option value="Numbness/Tingling">Numbness/Tingling</option>
+              <option value="Instability">Instability</option>
+              <option value="Swelling">Swelling</option>
+            </select>
+          </div>
+          <div class="body-map" id="bodyMap"></div>
+        </div>
+        <div class="summary-box"><strong>Selected regions:</strong><p id="selectedRegionsText">None selected yet.</p></div>
+        <br>
+        <button class="secondary" onclick="goToStep('category')">Back</button>
+        <button onclick="goToStep('questions')">Next</button>
+      </div>
+    </section>
+
+    <section id="questions" class="step">
+      <div class="card">
+        <h2>Tell us about your current status</h2>
+        <label>Patient name</label><input id="patientName" placeholder="e.g. Thando Mokoena">
+        <label>Age</label><input id="patientAge" type="number" placeholder="e.g. 28">
+        <label>Rate your pain from 0 to 10</label>
+        <input id="painScore" type="range" min="0" max="10" value="0" oninput="updatePainScore()">
+        <p><strong>Pain score:</strong> <span id="painScoreText">0</span>/10</p>
+        <div id="screeningQuestions"></div>
+        <label>Tell us more about your symptoms</label>
+        <textarea id="freeText" placeholder="Example: I hurt my lower back while lifting a box. It gets worse when I bend forward."></textarea>
+        <button class="secondary" onclick="goToStep('mapping')">Back</button>
+        <button onclick="submitAssessment()">Submit</button>
+      </div>
+    </section>
+
+    <section id="patientSummary" class="step">
+      <div class="card">
+        <h2>Your Assessment Summary & Next Steps</h2>
+        <div class="disclaimer">This is not a medical diagnosis. Your responses have been organised for review by a qualified professional.</div>
+        <br>
+        <div class="grid grid-2">
+          <div class="summary-box"><h3>Your reported information</h3><div id="patientSummaryOutput"></div></div>
+          <div class="summary-box"><h3>General safety guidance</h3><ul><li>Avoid movements that clearly increase your pain.</li><li>Keep movement gentle and within comfort.</li><li>Seek urgent care if symptoms suddenly worsen.</li><li>Report severe weakness, numbness, fainting, or loss of bladder/bowel control immediately.</li></ul></div>
+        </div>
+        <br>
+        <div class="card"><h3>Book a consultation</h3><div class="calendar-grid" id="timeSlots"></div><br><button onclick="confirmBooking()">Confirm Booking</button></div>
+        <button class="secondary" onclick="goToStep('questions')">Back</button>
+        <button onclick="goToStep('internDashboard')">View Intern Dashboard</button>
+      </div>
+    </section>
+
+    <section id="internDashboard" class="step">
+      <div class="card">
+        <h2>Intern Dashboard</h2>
+        <p class="small">The AI section is intake structuring only. Human clinical reasoning must be completed by the intern/clinician.</p>
+        <button onclick="goToStep('patientSummary')">Patient View</button>
+        <button onclick="goToStep('supervisorDashboard')">Supervisor Dashboard</button>
+        <div class="grid grid-2">
+          <div class="summary-box"><h3>Raw patient data</h3><div id="rawDataOutput"></div></div>
+          <div class="summary-box"><h3>AI-structured intake</h3><div id="aiOutput"></div></div>
+        </div>
+        <div class="card">
+          <h3>Intern clinical notes</h3>
+          <label>Subjective notes</label><textarea id="subjectiveNotes"></textarea>
+          <label>Objective assessment plan</label><textarea id="objectivePlan"></textarea>
+          <label>Clinical reasoning</label><textarea id="clinicalReasoning"></textarea>
+          <label>Proposed intervention strategy</label><textarea id="interventionPlan"></textarea>
+          <button onclick="saveInternNotes()">Save Intern Notes</button>
+          <button class="warning" onclick="sendForSupervisorReview()">Send to Supervisor</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="supervisorDashboard" class="step">
+      <div class="card">
+        <h2>Supervisor Dashboard</h2>
+        <button onclick="goToStep('internDashboard')">Back to Intern Dashboard</button>
+        <h3>Case Queue</h3>
+        <table><thead><tr><th>Patient</th><th>Category</th><th>Status</th><th>Booking</th></tr></thead><tbody id="caseQueue"></tbody></table>
+        <br>
+        <div class="grid grid-2">
+          <div class="summary-box"><h3>Intern submission</h3><div id="internSubmissionOutput"></div></div>
+          <div class="summary-box">
+            <h3>Supervisor guidance</h3>
+            <label>Supervisor comments</label><textarea id="supervisorComment"></textarea>
+            <button class="success" onclick="supervisorAction('Approved')">Approve</button>
+            <button class="warning" onclick="supervisorAction('Changes Requested')">Request Changes</button>
+            <button class="danger" onclick="supervisorAction('Escalated')">Escalate / Refer</button>
+          </div>
+        </div>
+        <br>
+        <div class="summary-box"><h3>Audit trail</h3><ul id="auditTrail"></ul></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const appState = {
+      patient: { name: '', age: '', category: '', figureType: 'Male', bodyView: 'Anterior', selectedRegions: [], painScore: 0, screening: {}, freeText: '', booking: '' },
+      aiStructuredOutput: null,
+      internNotes: { subjective: '', objective: '', reasoning: '', intervention: '' },
+      supervisor: { status: 'New', comments: '' },
+      auditTrail: []
+    };
+
+    const bodyRegions = {
+      Anterior: ['Head/Neck','Chest','Shoulder','Upper Arm','Elbow','Forearm','Wrist/Hand','Abdomen','Hip/Groin','Thigh','Knee','Shin','Ankle/Foot'],
+      Posterior: ['Neck','Upper Back','Shoulder Blade Region','Lower Back','Gluteal Region','Hamstring','Calf','Achilles','Ankle/Foot','Elbow','Wrist/Hand']
+    };
+
+    const screeningQuestions = [
+      'Did your symptoms start suddenly, for example from an injury or fall?',
+      'Does your pain wake you up at night?',
+      'Is there visible swelling in the sore area?',
+      'Do you feel numbness or tingling?',
+      'Is your balance affected?',
+      'Do symptoms worsen with repeated activity?',
+      'Have you had surgery or a major injury in this area before?',
+      'Do you feel unusual weakness?'
+    ];
+
+    const anatomyReference = {
+      'Head/Neck': { structures: ['cervical spine','upper trapezius','sternocleidomastoid','jaw/temporomandibular region'], exam: ['neck range of motion','posture observation','upper limb neurological screen','palpation of neck and shoulder girdle'] },
+      Neck: { structures: ['cervical spine','upper trapezius','levator scapulae','shoulder girdle'], exam: ['cervical ROM','shoulder screen','upper limb strength groups','palpation zones'] },
+      Shoulder: { structures: ['glenohumeral joint','scapula','rotator cuff region','acromioclavicular joint'], exam: ['shoulder ROM','scapular movement','rotator cuff strength groups','functional reaching patterns'] },
+      'Shoulder Blade Region': { structures: ['scapula','thoracic spine','rhomboid region','trapezius region'], exam: ['thoracic movement','scapular control','postural assessment','palpation around scapula'] },
+      Chest: { structures: ['rib cage','pectoralis region','thoracic spine','sternal region'], exam: ['thoracic mobility','breathing pattern observation','postural assessment'] },
+      'Upper Back': { structures: ['thoracic spine','ribs','trapezius region','paraspinal muscles'], exam: ['thoracic ROM','postural assessment','scapular movement','palpation regions'] },
+      'Lower Back': { structures: ['lumbar spine','sacroiliac region','gluteal region','hip complex'], exam: ['lumbar ROM','hip ROM','trunk strength groups','functional movement screen','palpation zones'] },
+      'Hip/Groin': { structures: ['hip joint','adductor region','iliopsoas region','gluteal region'], exam: ['hip ROM','single-leg control','hip strength groups','gait or squat movement'] },
+      'Gluteal Region': { structures: ['gluteal muscles','sacroiliac region','hip joint','pelvic region'], exam: ['hip ROM','glute strength groups','single-leg movement','palpation zones'] },
+      Knee: { structures: ['knee joint','quadriceps','hamstrings','patellar region','calf region'], exam: ['knee ROM','quadriceps and hamstring strength groups','squat or step-down pattern','gait observation'] },
+      Thigh: { structures: ['quadriceps','hamstrings','hip joint','knee joint'], exam: ['hip and knee ROM','thigh strength groups','functional loading patterns'] },
+      Hamstring: { structures: ['hamstring muscle group','ischial region','knee joint','hip joint'], exam: ['hamstring flexibility','hip ROM','posterior chain strength','running or hinge pattern if relevant'] },
+      Calf: { structures: ['gastrocnemius','soleus','Achilles tendon','ankle joint'], exam: ['ankle ROM','calf strength','heel raise capacity','gait observation'] },
+      Achilles: { structures: ['Achilles tendon','calf complex','heel region','ankle joint'], exam: ['ankle ROM','calf strength','heel raise assessment','walking/running load review'] },
+      'Ankle/Foot': { structures: ['ankle joint','foot arches','Achilles region','calf complex'], exam: ['ankle ROM','balance screen','gait observation','foot/ankle strength groups'] },
+      'Wrist/Hand': { structures: ['wrist joint','hand joints','forearm muscles','tendon regions'], exam: ['wrist ROM','grip strength','finger movement screen','palpation zones'] },
+      Elbow: { structures: ['elbow joint','forearm flexor/extensor groups','upper arm region'], exam: ['elbow ROM','grip strength','forearm strength groups','functional lifting or gripping'] },
+      'Upper Arm': { structures: ['biceps region','triceps region','shoulder joint','elbow joint'], exam: ['shoulder and elbow ROM','upper arm strength groups','functional reaching or lifting'] },
+      Forearm: { structures: ['forearm flexors','forearm extensors','wrist joint','elbow joint'], exam: ['wrist and elbow ROM','grip strength','forearm strength groups'] },
+      Abdomen: { structures: ['abdominal wall','trunk muscles','pelvic region','lumbar spine'], exam: ['trunk control','breathing pattern','core strength groups','functional movement screen'] },
+      Shin: { structures: ['tibial region','anterior lower leg muscles','ankle joint','knee joint'], exam: ['ankle ROM','walking/running load review','lower limb strength groups'] }
+    };
+
+    const timeSlots = ['09:00 AM','10:30 AM','12:00 PM','02:00 PM','03:30 PM','05:00 PM'];
+
+    function goToStep(stepId) {
+      document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+      document.getElementById(stepId).classList.add('active');
+      if (stepId === 'mapping') renderBodyMap();
+      if (stepId === 'questions') renderScreeningQuestions();
+      if (stepId === 'patientSummary') renderPatientSummary();
+      if (stepId === 'internDashboard') renderInternDashboard();
+      if (stepId === 'supervisorDashboard') renderSupervisorDashboard();
+      window.scrollTo(0, 0);
+    }
+
+    function addAudit(message) { appState.auditTrail.push(`${new Date().toLocaleString()} — ${message}`); }
+
+    function selectCategory(category) {
+      appState.patient.category = category;
+      document.querySelectorAll('#categoryOptions .pill').forEach(pill => pill.classList.remove('active'));
+      [...document.querySelectorAll('#categoryOptions .pill')].find(pill => pill.textContent.includes(category)).classList.add('active');
+      addAudit(`Patient selected category: ${category}`);
+    }
+
+    function renderBodyMap() {
+      const view = document.getElementById('bodyView').value;
+      appState.patient.bodyView = view;
+      const map = document.getElementById('bodyMap');
+      map.innerHTML = `<h3>${view} view</h3>`;
+      bodyRegions[view].forEach(region => {
+        const btn = document.createElement('button');
+        btn.className = 'body-zone';
+        btn.textContent = region;
+        if (appState.patient.selectedRegions.some(item => item.region === region && item.view === view)) btn.classList.add('selected');
+        btn.onclick = () => toggleRegion(region, view);
+        map.appendChild(btn);
+      });
+      renderSelectedRegions();
+    }
+
+    function toggleRegion(region, view) {
+      const symptomType = document.getElementById('symptomType').value;
+      const index = appState.patient.selectedRegions.findIndex(item => item.region === region && item.view === view);
+      if (index >= 0) appState.patient.selectedRegions.splice(index, 1);
+      else appState.patient.selectedRegions.push({ region, view, symptomType });
+      addAudit('Patient updated body map selection.');
+      renderBodyMap();
+    }
+
+    function renderSelectedRegions() {
+      const text = document.getElementById('selectedRegionsText');
+      if (!appState.patient.selectedRegions.length) { text.textContent = 'None selected yet.'; return; }
+      text.innerHTML = appState.patient.selectedRegions.map(item => `${item.symptomType}: ${item.region} (${item.view})`).join('<br>');
+    }
+
+    function renderScreeningQuestions() {
+      const box = document.getElementById('screeningQuestions');
+      box.innerHTML = '';
+      screeningQuestions.forEach(question => {
+        if (!appState.patient.screening[question]) appState.patient.screening[question] = '';
+        const row = document.createElement('div'); row.className = 'question-row';
+        const q = document.createElement('div'); q.textContent = question;
+        const controls = document.createElement('div'); controls.className = 'yes-no';
+        ['Yes','No'].forEach(answer => {
+          const btn = document.createElement('button');
+          btn.textContent = answer.toUpperCase();
+          if (appState.patient.screening[question] === answer) btn.classList.add('active');
+          btn.onclick = () => { appState.patient.screening[question] = answer; renderScreeningQuestions(); };
+          controls.appendChild(btn);
+        });
+        row.appendChild(q); row.appendChild(controls); box.appendChild(row);
+      });
+    }
+
+    function updatePainScore() {
+      const value = document.getElementById('painScore').value;
+      document.getElementById('painScoreText').textContent = value;
+      appState.patient.painScore = Number(value);
+    }
+
+    function submitAssessment() {
+      appState.patient.name = document.getElementById('patientName').value.trim() || 'Unnamed patient';
+      appState.patient.age = document.getElementById('patientAge').value.trim() || 'Not provided';
+      appState.patient.painScore = Number(document.getElementById('painScore').value);
+      appState.patient.freeText = document.getElementById('freeText').value.trim();
+      if (!appState.patient.category) { alert('Please choose an assessment category.'); goToStep('category'); return; }
+      if (!appState.patient.selectedRegions.length) { alert('Please select at least one body region.'); goToStep('mapping'); return; }
+      appState.aiStructuredOutput = structureIntakeOnly(appState.patient);
+      appState.supervisor.status = 'Awaiting Intern Review';
+      addAudit('Patient submitted assessment.');
+      addAudit('AI intake structuring completed. No diagnosis generated.');
+      goToStep('patientSummary');
+    }
+
+    function structureIntakeOnly(patient) {
+      const regions = patient.selectedRegions.map(item => item.region);
+      const structures = new Set();
+      const exam = new Set();
+      regions.forEach(region => {
+        const ref = anatomyReference[region];
+        if (ref) { ref.structures.forEach(x => structures.add(x)); ref.exam.forEach(x => exam.add(x)); }
+      });
+      const positives = Object.entries(patient.screening).filter(([, answer]) => answer === 'Yes').map(([question]) => question);
+      const unanswered = Object.entries(patient.screening).filter(([, answer]) => answer === '').map(([question]) => question);
+      return {
+        type: 'AI intake structuring only',
+        anatomyReference: { selectedAnatomicalRegions: regions, surroundingStructures: [...structures], commonExamCategories: [...exam] },
+        screeningSummary: { positiveScreeningResponses: positives, unansweredScreeningResponses: unanswered },
+        prohibitedOutputReminder: ['No diagnosis generated.','No condition suggested.','No treatment plan generated.','No referral decision generated.','Clinical reasoning must be performed by a qualified professional.']
+      };
+    }
+
+    function renderPatientSummary() {
+      document.getElementById('patientSummaryOutput').innerHTML = `
+        <p><strong>Name:</strong> ${appState.patient.name}</p>
+        <p><strong>Category:</strong> ${appState.patient.category}</p>
+        <p><strong>Pain score:</strong> ${appState.patient.painScore}/10</p>
+        <p><strong>Selected areas:</strong></p>
+        <ul>${appState.patient.selectedRegions.map(item => `<li>${item.symptomType}: ${item.region} (${item.view})</li>`).join('')}</ul>
+        <p><strong>Your description:</strong></p><p>${appState.patient.freeText || 'No description provided.'}</p>`;
+      renderTimeSlots();
+    }
+
+    function renderTimeSlots() {
+      const box = document.getElementById('timeSlots'); box.innerHTML = '';
+      timeSlots.forEach(slot => {
+        const btn = document.createElement('button');
+        btn.textContent = slot; btn.className = 'time-slot';
+        if (appState.patient.booking === slot) btn.classList.add('active');
+        btn.onclick = () => { appState.patient.booking = slot; renderTimeSlots(); };
+        box.appendChild(btn);
+      });
+    }
+
+    function confirmBooking() {
+      if (!appState.patient.booking) { alert('Please select a time slot.'); return; }
+      addAudit(`Patient booked consultation for ${appState.patient.booking}.`);
+      alert(`Booking confirmed for ${appState.patient.booking}.`);
+    }
+
+    function renderInternDashboard() {
+      document.getElementById('rawDataOutput').innerHTML = `
+        <p><strong>Name:</strong> ${appState.patient.name}</p>
+        <p><strong>Age:</strong> ${appState.patient.age}</p>
+        <p><strong>Category:</strong> ${appState.patient.category}</p>
+        <p><strong>Pain score:</strong> ${appState.patient.painScore}/10</p>
+        <ul>${appState.patient.selectedRegions.map(item => `<li>${item.symptomType}: ${item.region} (${item.view})</li>`).join('')}</ul>
+        <p>${appState.patient.freeText || 'No free-text narrative provided.'}</p>`;
+      const ai = appState.aiStructuredOutput;
+      document.getElementById('aiOutput').innerHTML = `
+        <p><strong>Output type:</strong> ${ai.type}</p>
+        <p><strong>Selected regions:</strong></p><ul>${ai.anatomyReference.selectedAnatomicalRegions.map(x => `<li>${x}</li>`).join('')}</ul>
+        <p><strong>Nearby structures:</strong></p><ul>${ai.anatomyReference.surroundingStructures.map(x => `<li>${x}</li>`).join('')}</ul>
+        <p><strong>Common examination categories:</strong></p><ul>${ai.anatomyReference.commonExamCategories.map(x => `<li>${x}</li>`).join('')}</ul>
+        <p><strong>Positive screening responses:</strong></p><ul>${ai.screeningSummary.positiveScreeningResponses.length ? ai.screeningSummary.positiveScreeningResponses.map(x => `<li>${x}</li>`).join('') : '<li>None selected.</li>'}</ul>
+        <p><strong>Safety boundary:</strong></p><ul>${ai.prohibitedOutputReminder.map(x => `<li>${x}</li>`).join('')}</ul>`;
+      document.getElementById('subjectiveNotes').value = appState.internNotes.subjective;
+      document.getElementById('objectivePlan').value = appState.internNotes.objective;
+      document.getElementById('clinicalReasoning').value = appState.internNotes.reasoning;
+      document.getElementById('interventionPlan').value = appState.internNotes.intervention;
+    }
+
+    function saveInternNotes() {
+      appState.internNotes.subjective = document.getElementById('subjectiveNotes').value.trim();
+      appState.internNotes.objective = document.getElementById('objectivePlan').value.trim();
+      appState.internNotes.reasoning = document.getElementById('clinicalReasoning').value.trim();
+      appState.internNotes.intervention = document.getElementById('interventionPlan').value.trim();
+      appState.supervisor.status = 'Draft Plan Ready';
+      addAudit('Intern saved clinical notes.');
+      alert('Intern notes saved.');
+    }
+
+    function sendForSupervisorReview() {
+      saveInternNotes();
+      appState.supervisor.status = 'Supervisor Review Needed';
+      addAudit('Intern sent case for supervisor review.');
+      goToStep('supervisorDashboard');
+    }
+
+    function renderSupervisorDashboard() {
+      const statusClass = appState.supervisor.status === 'Approved' ? 'approved' : appState.supervisor.status === 'Changes Requested' ? 'revision' : appState.supervisor.status === 'Supervisor Review Needed' ? 'review' : '';
+      document.getElementById('caseQueue').innerHTML = `<tr><td>${appState.patient.name}</td><td>${appState.patient.category}</td><td><span class="status ${statusClass}">${appState.supervisor.status}</span></td><td>${appState.patient.booking || 'Not booked yet'}</td></tr>`;
+      document.getElementById('internSubmissionOutput').innerHTML = `
+        <h4>Patient intake</h4><p><strong>Name:</strong> ${appState.patient.name}</p><p><strong>Category:</strong> ${appState.patient.category}</p><p><strong>Pain score:</strong> ${appState.patient.painScore}/10</p>
+        <h4>AI-structured reference layer</h4><p><strong>Regions:</strong> ${appState.aiStructuredOutput.anatomyReference.selectedAnatomicalRegions.join(', ')}</p><p><strong>Structures:</strong> ${appState.aiStructuredOutput.anatomyReference.surroundingStructures.join(', ')}</p><p><strong>Exam categories:</strong> ${appState.aiStructuredOutput.anatomyReference.commonExamCategories.join(', ')}</p>
+        <h4>Intern clinical notes</h4><p><strong>Subjective:</strong> ${appState.internNotes.subjective || 'Not completed.'}</p><p><strong>Objective plan:</strong> ${appState.internNotes.objective || 'Not completed.'}</p><p><strong>Clinical reasoning:</strong> ${appState.internNotes.reasoning || 'Not completed.'}</p><p><strong>Intervention strategy:</strong> ${appState.internNotes.intervention || 'Not completed.'}</p>
+        <h4>Supervisor comments</h4><p>${appState.supervisor.comments || 'No supervisor comments yet.'}</p>`;
+      document.getElementById('supervisorComment').value = appState.supervisor.comments;
+      document.getElementById('auditTrail').innerHTML = appState.auditTrail.map(x => `<li>${x}</li>`).join('') || '<li>No activity yet.</li>';
+    }
+
+    function supervisorAction(action) {
+      const comment = document.getElementById('supervisorComment').value.trim();
+      appState.supervisor.status = action;
+      appState.supervisor.comments = comment || 'No comment provided.';
+      addAudit(`Supervisor action: ${action}.`);
+      alert(`Supervisor status updated: ${action}`);
+      renderSupervisorDashboard();
+    }
+
+    renderBodyMap();
+  </script>
+</body>
+</html>

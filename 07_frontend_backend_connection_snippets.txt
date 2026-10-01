@@ -1,0 +1,109 @@
+FRONTEND TO BACKEND CONNECTION SNIPPETS
+
+Add this near the top of your frontend script:
+
+const API_URL = "http://localhost:4000/api";
+let authToken = "";
+let currentAssessmentId = null;
+
+Demo patient login:
+
+async function loginDemoPatient() {
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "patient@demo.com",
+      password: "Password123!"
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    alert(data.error || "Login failed");
+    return;
+  }
+
+  authToken = data.token;
+  alert("Logged in as demo patient");
+}
+
+Submit assessment to backend:
+
+async function submitAssessmentToBackend() {
+  const payload = {
+    patientName: document.getElementById("patientName").value.trim(),
+    patientAge: Number(document.getElementById("patientAge").value) || null,
+    category: appState.patient.category,
+    figureType: appState.patient.figureType,
+    bodyView: appState.patient.bodyView,
+    selectedRegions: appState.patient.selectedRegions,
+    painScore: Number(document.getElementById("painScore").value),
+    screening: appState.patient.screening,
+    freeText: document.getElementById("freeText").value.trim()
+  };
+
+  const response = await fetch(`${API_URL}/assessments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(data);
+    alert(data.error || "Assessment submission failed");
+    return;
+  }
+
+  currentAssessmentId = data.assessment.id;
+  appState.aiStructuredOutput = data.assessment.aiStructured;
+
+  alert("Assessment submitted");
+}
+
+Save booking to backend:
+
+async function saveBookingToBackend(slot) {
+  const response = await fetch(`${API_URL}/assessments/${currentAssessmentId}/booking`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`
+    },
+    body: JSON.stringify({
+      appointmentTime: slot,
+      consultantName: "Consultant"
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    alert(data.error || "Booking failed");
+    return;
+  }
+
+  alert("Booking saved");
+}
+
+Useful backend endpoints:
+
+POST /api/auth/register
+POST /api/auth/login
+POST /api/assessments
+GET /api/my/assessments
+GET /api/assessments/:id
+POST /api/assessments/:id/booking
+GET /api/intern/cases
+PATCH /api/intern/cases/:id/notes
+PATCH /api/intern/cases/:id/send-to-supervisor
+GET /api/supervisor/cases
+PATCH /api/supervisor/cases/:id/action
+GET /api/assessments/:id/audit
+GET /api/reference/anatomy
